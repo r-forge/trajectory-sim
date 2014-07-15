@@ -1,0 +1,11 @@
+Package: trajectorySim
+Type: Package
+Title: Trajectory Similarity
+Version: 0.1
+Date: 2014-07-15
+Depends: R (>= 2.14.0)
+Suggests: move (>= 1.2.475)
+Author: Dongliang Peng <dongliang.peng@uni-wuerzburg.de>, Stef Sijben <Stef.Sijben@ruhr-uni-bochum.de>
+Maintainer: Stef Sijben <Stef.Sijben@ruhr-uni-bochum.de>
+Description: Similarity measures for trajectories, including Hausdorff, equal-time, Fréchet distances, dynamic time warping (DTW), longest common subsequence (LCSS), spatiotemporal locality inside polylines (STLIP). Arbitrary dimension, flexible distance metric.
+License: GPL (>= 3)
