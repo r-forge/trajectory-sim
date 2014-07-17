@@ -25,3 +25,23 @@
 }
 euclidian <- Lp.norm(2)
 manhattan <- Lp.norm(1)
+
+## Distance between lat/long coordinates (and time) on a sphere of radius R.
+## Yields distance in same units as R. Default R is mean Earth radius in meters.
+## Great circle distance is accurate to about 0.5% on Earth.
+## Default lat/long units are degrees
+"great.circle.dist" <- function(x1, x2, R=6371000, units=c("degrees","radians")) {
+	if (length(x1) != 3 || length(x2) != 3) {
+		stop("Points must have two coordinates and time")
+	}
+	units <- match.arg(units)
+	if (units == "degrees") {
+		x1 <- x1 * pi / 180
+		x2 <- x2 * pi / 180
+	}
+
+	# The Haversine method
+	a <- sin((x1[1]-x2[1])/2)^2 + cos(x1[1]) * cos(x2[1]) * sin((x1[2]-x2[2])/2)^2
+	c <- 2 * atan2(sqrt(a), sqrt(1-a))
+	R * c
+}
