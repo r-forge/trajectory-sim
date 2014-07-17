@@ -1,5 +1,13 @@
 ## Compute trajectory similarities according to the continuous Fréchet distance, under a convex distance measure.
-## TODO: Check details of implementation against original paper
+
+"frechet" <- function(trajectories, dp=euclidian) {
+	trajectory.similarity(trajectories, implementation=frechet.pairwise, dp=dp, symmetric=TRUE, diagonal=0)
+}
+
+"frechet.decision" <- function(trajectories, epsilon=0, dp=euclidian) {
+	trajectory.similarity(trajectories, implementation=frechet.decision,pairwise,
+			epsilon=epsilon, dp=dp, symmetric=TRUE, diagonal=0)
+}
 
 "frechet.pairwise" <- function(T1, T2, dp=euclidian) {
 	# Exponential search for upper bound on d_F
@@ -19,15 +27,14 @@
 		} else {
 			low  <- epsilon
 		}
-		print(paste(low, epsilon, high))
 	}
 	epsilon
 }
 
 "frechet.decision.pairwise" <- function(T1, T2, epsilon=0, dp=euclidian) {
 	# Set up the free space diagram
-	fsd <- as.list(rep(NA, nrow(T1)*nrow(T2)))
-	dim(fsd) <- c(nrow(T1), nrow(T2))	# T1 indexes rows, T2 columns.
+	fsd <- as.list(rep(NA, (nrow(T1)-1)*(nrow(T2)-1)))
+	dim(fsd) <- c(nrow(T1)-1, nrow(T2)-1)	# T1 indexes rows, T2 columns.
 	
 	## First check whether endpoints are free
 	if (dp(T1[1,], T2[1,]) > epsilon
@@ -71,14 +78,13 @@
 					c(max(cb$reach.B[1], free.B[1]), free.B[2])
 				} else { NULL }
 			}
-			print(paste(i,j))
+			
 			fsd[[i,j]] = list(free.L=free.L, free.B=free.B,
 					reach.L=reach.L, reach.B=reach.B)
-			print(fsd[[i,j]])
 		} # for j
 	} # for i
 	# We know the endpoint is free, check whether the final cell is reachable
-	any(!is.null(fsd[[nrow(T1),nrow(T2)]][c("reach.L","reach.B")]))
+	!all(sapply(fsd[[nrow(T1)-1,nrow(T2)-1]][c("reach.L","reach.B")], is.null))
 }
 
 ## returns interval boundaries 0 <= a <= b <= 1 such that q1 + alpha (q2-q1) 
