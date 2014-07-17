@@ -27,7 +27,7 @@ setClass(Class = "ts.dp.entry",
 # 	T1, T2: trajectories
 # 	dp:     a function that provides the distance between two location entries
 # it returns the table entry for (i,j)
-"traj.sim.dp" <- function(T1, T2, step.fun, dp=euclidian) {
+"traj.sim.dp" <- function(T1, T2, step.fun, dp=euclidian, ...) {
 	dp.table <- as.list(rep(NA, nrow(T1)*nrow(T2)))
 	dim(dp.table) <- c(nrow(T1), nrow(T2))	# T1 indexes rows, T2 columns.
 	
@@ -38,17 +38,17 @@ setClass(Class = "ts.dp.entry",
 	assign("dp", dp, envir=env)
 	environment(step.fun) <- env
 	
-	dp.table[[1,1]] <- step.fun(1, 1)
+	dp.table[[1,1]] <- step.fun(1, 1, list(), ...)
 	for (i in 2:nrow(T1)) {
-		dp.table[[i,1]] <- step.fun(i, 1, list(V=dp.table[[i-1,1]]))
+		dp.table[[i,1]] <- step.fun(i, 1, list(V=dp.table[[i-1,1]]), ...)
 	}
 	for (j in 2:nrow(T2)) {
-		dp.table[[1,j]] <- step.fun(1, j, list(H=dp.table[[1,j-1]]))
+		dp.table[[1,j]] <- step.fun(1, j, list(H=dp.table[[1,j-1]]), ...)
 	}
 	for (i in 2:nrow(T1)) {
 		for (j in 2:nrow(T2)) {
 			dp.table[[i,j]] <- step.fun(i, j, list(
-					V=dp.table[[i-1,j]], H=dp.table[[i,j-1]], D=dp.table[[i-1,j-1]]))
+					V=dp.table[[i-1,j]], H=dp.table[[i,j-1]], D=dp.table[[i-1,j-1]]), ...)
 		}
 	}
 	res <- dp.table[[nrow(T1),nrow(T2)]]@value
