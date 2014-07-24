@@ -19,6 +19,12 @@ setClass(Class = "ts.dp.entry",
 	}
 )
 
+setMethod(f = "as.numeric", 
+		signature = c(x="ts.dp.entry"),
+		function(x, ...) {
+	x@value
+})
+
 
 # step.fun is a function that takes parameters
 # 	i, j:   indices into T1 and T2
@@ -27,9 +33,12 @@ setClass(Class = "ts.dp.entry",
 # 	T1, T2: trajectories
 # 	dp:     a function that provides the distance between two location entries
 # it returns the table entry for (i,j)
-"traj.sim.dp" <- function(T1, T2, step.fun, dp=euclidian, ...) {
-	dp.table <- as.list(rep(NA, nrow(T1)*nrow(T2)))
-	dim(dp.table) <- c(nrow(T1), nrow(T2))	# T1 indexes rows, T2 columns.
+"traj.sim.dp" <- function(T1, T2, step.fun, dp=euclidian, ...,
+		get.matching=FALSE, max.dt=Inf, steps=list(H=c(0,-1), V=c(-1,0), D=c(-1,-1))) { #TODO: deal with get.matching, max.dt and steps
+	dp.cols <- rep(list(NULL), nrow(T2))
+	dp.emptycol <- rep(list(NA), nrow(T1))
+	col.start <- 1 # At which row indices to start/stop processing the next column
+	col.stop  <- 1 # First index that is NOT processed
 	
 	# Set up an environment for the step function to avoid unnecessary argument passing
 	env <- new.env(parent=environment())
@@ -38,25 +47,66 @@ setClass(Class = "ts.dp.entry",
 	assign("dp", dp, envir=env)
 	environment(step.fun) <- env
 	
-	dp.table[[1,1]] <- step.fun(1, 1, list(), ...)
-	for (i in 2:nrow(T1)) {
-		dp.table[[i,1]] <- step.fun(i, 1, list(V=dp.table[[i-1,1]]), ...)
-	}
-	for (j in 2:nrow(T2)) {
-		dp.table[[1,j]] <- step.fun(1, j, list(H=dp.table[[1,j-1]]), ...)
-	}
-	for (i in 2:nrow(T1)) {
-		for (j in 2:nrow(T2)) {
-			dp.table[[i,j]] <- step.fun(i, j, list(
-					V=dp.table[[i-1,j]], H=dp.table[[i,j-1]], D=dp.table[[i-1,j-1]]), ...)
+#	## Process the first column of the table
+#	dp.cols[[1]] <- dp.emptycol
+#	if (abs(T1[1,ncol(T1)] - T2[1,ncol(T2)]) <= max.dt) {
+#		# Compute only if time difference not too big
+#		dp.cols[[1]][[1]] <- step.fun(1, 1, list(), ...)
+#	}
+#	for (i in 2:nrow(T1)) {
+#		if (T1[i,ncol(T1)] > T2[1,ncol(T2)] + max.dt) {
+#			break # Stop processing this column; time difference too big
+#		}
+#		dp.cols[[1]][[i]] <- step.fun(i, 1, list(V=dp.cols[[1]][[i-1]]), ...)
+#	}
+
+	## Process the remaining columns
+	for (j in 1:nrow(T2)) {
+		dp.cols[[j]] <- dp.emptycol
+#		if (abs(T1[1,ncol(T1)] - T2[j,ncol(T2)]) <= max.dt) {
+#			# Compute only if time difference not too big
+#			dp.cols[[j]][[1]] <- step.fun(1, j, list(H=dp.cols[[j-1]][[1]]), ...)
+#		}
+		
+		## Search where to start processing this column; not before the previous
+		while(col.start <= nrow(T1)
+				&& T1[col.start,ncol(T1)] < T2[j,ncol(T2)] - max.dt) {
+			col.start <- col.start + 1
+		}
+		while(col.stop <= nrow(T1)
+				&& T1[col.stop,ncol(T1)] <= T2[j,ncol(T2)] + max.dt) {
+			col.stop <- col.stop + 1
+		}
+		
+		for (i in col.start:(col.stop-1)) {			
+			preds <- lapply(steps, function(step) {
+				i <- i + step[1]
+				j <- j + step[2]
+				if (i >= 1 && j >= 1) {
+					dp.cols[[j]][[i]]
+				} else {
+					NA
+				}
+			})
+			preds <- preds[!is.na(preds)] # Provide only predecessors that are set
+			dp.cols[[j]][[i]] <- step.fun(i, j, preds, ...)
+		}
+		if (!get.matching) {
+			## Delete column that we no longer need to compute new entries
+			dp.cols[[j-1]] <- NULL
 		}
 	}
-	res <- dp.table[[nrow(T1),nrow(T2)]]@value
-	## For now, always return matching, DP table values and the table itself for debugging.
-	## TODO: Allow the user to choose what attributes to return and adapt the implementation to it.
-	attr(res, "matching") <- .matching(dp.table)
-	attr(res, "table.values") <- matrix(sapply(dp.table, function(entry) { entry@value }), nrow(T1), nrow(T2))
-	attr(res, "table") <- dp.table
+	res <- dp.cols[[nrow(T2)]][[nrow(T1)]]@value
+	## Return matching, DP table values and the table itself, if requested.
+	if (get.matching) {
+		dp.table <- do.call(c, dp.cols)
+		dim(dp.table) <- dim(dp.table) <- c(nrow(T1), nrow(T2))	# T1 indexes rows, T2 columns.
+		attr(res, "matching") <- .matching(dp.table)
+		attr(res, "table.values") <- matrix(sapply(dp.table, function(entry) {
+					as.numeric(entry) # Extracts value or passes through NA
+				}), nrow(T1), nrow(T2))
+		attr(res, "table") <- dp.table
+	}
 	res
 }
 

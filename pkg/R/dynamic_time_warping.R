@@ -5,8 +5,8 @@
 	trajectory.similarity(trajectories, implementation=DTW.pairwise, dp=dp, symmetric=TRUE, diagonal=0)
 }
 
-"DTW.pairwise" <- function(T1, T2, dp=euclidian) {
-	traj.sim.dp(T1, T2, .DTW.step.fun, dp)
+"DTW.pairwise" <- function(T1, T2, dp=euclidian, ...) {
+	traj.sim.dp(T1, T2, .DTW.step.fun, dp, ...)
 }
 
 ## DP step function for DTW

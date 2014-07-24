@@ -6,8 +6,8 @@
 			delta=delta, epsilon=epsilon, symmetric=TRUE, diagonal=0)
 }
 
-"LCSS.pairwise" <- function(T1, T2, delta, epsilon, dp=Lp.norm(Inf)) {
-	traj.sim.dp(T1, T2, .LCSS.step.fun, dp, delta=delta, epsilon=epsilon)
+"LCSS.pairwise" <- function(T1, T2, delta, epsilon, dp=Lp.norm(Inf), ...) {
+	traj.sim.dp(T1, T2, .LCSS.step.fun, dp, delta=delta, epsilon=epsilon, ...)
 }
 
 ## DP step function for DTW

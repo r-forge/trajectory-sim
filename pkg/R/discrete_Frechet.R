@@ -4,8 +4,8 @@
 	trajectory.similarity(trajectories, implementation=discrete.frechet.pairwise, dp=dp, symmetric=TRUE, diagonal=0)
 }
 
-"discrete.frechet.pairwise" <- function(T1, T2, dp=euclidian) {
-	traj.sim.dp(T1, T2, .discrete.frechet.step.fun, dp)
+"discrete.frechet.pairwise" <- function(T1, T2, dp=euclidian, ...) {
+	traj.sim.dp(T1, T2, .discrete.frechet.step.fun, dp, ...)
 }
 
 ## DP step function for discrete Fréchet
