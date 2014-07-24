@@ -34,7 +34,8 @@ setMethod(f = "as.numeric",
 # 	dp:     a function that provides the distance between two location entries
 # it returns the table entry for (i,j)
 "traj.sim.dp" <- function(T1, T2, step.fun, dp=euclidian, ...,
-		get.matching=FALSE, max.dt=Inf, steps=list(H=c(0,-1), V=c(-1,0), D=c(-1,-1))) { #TODO: deal with get.matching, max.dt and steps
+		get.matching=FALSE, max.dt=Inf, 
+		steps=list(H=c(0,-1), V=c(-1,0), D=c(-1,-1))) {
 	dp.cols <- rep(list(NULL), nrow(T2))
 	dp.emptycol <- rep(list(NA), nrow(T1))
 	col.start <- 1 # At which row indices to start/stop processing the next column
@@ -47,26 +48,9 @@ setMethod(f = "as.numeric",
 	assign("dp", dp, envir=env)
 	environment(step.fun) <- env
 	
-#	## Process the first column of the table
-#	dp.cols[[1]] <- dp.emptycol
-#	if (abs(T1[1,ncol(T1)] - T2[1,ncol(T2)]) <= max.dt) {
-#		# Compute only if time difference not too big
-#		dp.cols[[1]][[1]] <- step.fun(1, 1, list(), ...)
-#	}
-#	for (i in 2:nrow(T1)) {
-#		if (T1[i,ncol(T1)] > T2[1,ncol(T2)] + max.dt) {
-#			break # Stop processing this column; time difference too big
-#		}
-#		dp.cols[[1]][[i]] <- step.fun(i, 1, list(V=dp.cols[[1]][[i-1]]), ...)
-#	}
-
 	## Process the remaining columns
 	for (j in 1:nrow(T2)) {
 		dp.cols[[j]] <- dp.emptycol
-#		if (abs(T1[1,ncol(T1)] - T2[j,ncol(T2)]) <= max.dt) {
-#			# Compute only if time difference not too big
-#			dp.cols[[j]][[1]] <- step.fun(1, j, list(H=dp.cols[[j-1]][[1]]), ...)
-#		}
 		
 		## Search where to start processing this column; not before the previous
 		while(col.start <= nrow(T1)
@@ -78,7 +62,7 @@ setMethod(f = "as.numeric",
 			col.stop <- col.stop + 1
 		}
 		
-		for (i in col.start:(col.stop-1)) {			
+		for (i in col.start:(col.stop-1)) {
 			preds <- lapply(steps, function(step) {
 				i <- i + step[1]
 				j <- j + step[2]
@@ -101,7 +85,7 @@ setMethod(f = "as.numeric",
 	if (get.matching) {
 		dp.table <- do.call(c, dp.cols)
 		dim(dp.table) <- dim(dp.table) <- c(nrow(T1), nrow(T2))	# T1 indexes rows, T2 columns.
-		attr(res, "matching") <- .matching(dp.table)
+		attr(res, "matching") <- .matching(dp.table, steps)
 		attr(res, "table.values") <- matrix(sapply(dp.table, function(entry) {
 					as.numeric(entry) # Extracts value or passes through NA
 				}), nrow(T1), nrow(T2))
@@ -110,23 +94,18 @@ setMethod(f = "as.numeric",
 	res
 }
 
-".matching" <- function(dp.t) {
+".matching" <- function(dp.t, steps) {
 	res <- matrix(NA, 2, sum(dim(dp.t))-1)
-	i <- nrow(dp.t)
-	j <- ncol(dp.t)
+	pos <- c(nrow(dp.t), ncol(dp.t))
 	l <- ncol(res)
-	res[,l] <- c(i,j)
-	while(i > 1 || j > 1) {
+	res[,l] <- pos
+
+	entry <- dp.t[[pos[1],pos[2]]]
+	while(!is.null(entry@pred)) {
 		l <- l-1
-		entry <- dp.t[[i,j]]
-		p <- switch(entry@pred,
-				V=c(i-1,j  ),
-				H=c(i  ,j-1),
-				D=c(i-1,j-1)
-		)
-		res[,l] <- p
-		i <- p[1]
-		j <- p[2]
+		pos <- pos + steps[[entry@pred]]
+		res[,l] <- pos
+		entry <- dp.t[[pos[1],pos[2]]]
 	}
 	res[,l:ncol(res)]
 }
