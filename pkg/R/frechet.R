@@ -14,7 +14,6 @@
 	epsilon <- 1.0
 	while (!frechet.decision.pairwise(T1,T2,epsilon,dp)) {
 		epsilon <- 2 * epsilon
-		print(epsilon)
 	}
 
 	# Binary search for exact value (up to machine precision)	

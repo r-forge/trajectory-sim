@@ -9,7 +9,7 @@
 }
 
 ## DP step function for discrete Fréchet
-".discrete.frechet.step.fun" <- function(i, j, prev=list()) {
+".discrete.frechet.step.fun" <- function(T1, T2, i, j, prev, dp) {
 	if (length(prev) == 0) {
 		## Lower left corner of table
 		new("ts.dp.entry",

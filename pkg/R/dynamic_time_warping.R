@@ -10,7 +10,7 @@
 }
 
 ## DP step function for DTW
-".DTW.step.fun" <-  function(i, j, prev=list()) {
+".DTW.step.fun" <-  function(T1, T2, i, j, prev, dp) {
 	if (length(prev) == 0) { 
 		p = new("ts.dp.entry", value=0, pred=NULL, data=list(sum=0, len=0))
 		pd = NULL

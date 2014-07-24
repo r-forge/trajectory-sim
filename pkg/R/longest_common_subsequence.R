@@ -11,7 +11,7 @@
 }
 
 ## DP step function for DTW
-".LCSS.step.fun" <-  function(i, j, prev=list(), delta, epsilon) {
+".LCSS.step.fun" <-  function(T1, T2, i, j, prev, dp, delta, epsilon) {
 	## Take diagonal predecessor and add one to value
 	if (dp(T1[i,], T2[j,]) < epsilon && abs(i-j) <= delta) {
 		if ("D" %in% names(prev)) {
