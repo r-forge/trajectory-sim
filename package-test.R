@@ -1,4 +1,5 @@
 library(trajectorySim)
+library(equal_time)
 ## The following line unloads the package and reloads it again, to incorporate any changes
 detach("package:trajectorySim", unload=TRUE); library(trajectorySim)
 
