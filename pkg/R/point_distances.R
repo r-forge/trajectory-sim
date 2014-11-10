@@ -19,9 +19,9 @@
 			max(abs(x1[-length(x1)] - x2[-length(x2)]))
 		})
 	}
-	function(x1, x2) {
+	return(function(x1, x2) {
 		sum(abs(x1[-length(x1)] - x2[-length(x2)])^p)^(1/p)
-	}
+	})
 }
 euclidian <- Lp.norm(2)
 manhattan <- Lp.norm(1)
@@ -45,3 +45,4 @@ manhattan <- Lp.norm(1)
 	c <- 2 * atan2(sqrt(a), sqrt(1-a))
 	R * c
 }
+

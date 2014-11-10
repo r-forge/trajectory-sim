@@ -9,7 +9,7 @@ setGeneric("trajectory.similarity", function(trajectories, implementation, ..., 
 if ("move" %in% rownames(installed.packages()) && require(move)) {
 	setMethod(f = "trajectory.similarity", 
 			signature = c(trajectories = "MoveStack"),
-			function(trajectories, ...) {
+			function(trajectories, ..., symmetric = FALSE, diagonal=NA) {
 		## Convert the MoveStack into a list of individual trajectories,
 		## represented as matrices with coordinate and time columns
 		trs <- lapply(split(monkey.tr), function(tr) {
