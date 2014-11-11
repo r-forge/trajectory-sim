@@ -40,7 +40,7 @@ manhattan <- Lp.norm(1)
 		x2 <- x2 * pi / 180
 	}
 
-	# The Haversine method
+	# The Haversine method for best accuracy and numerical stability
 	a <- sin((x1[1]-x2[1])/2)^2 + cos(x1[1]) * cos(x2[1]) * sin((x1[2]-x2[2])/2)^2
 	c <- 2 * atan2(sqrt(a), sqrt(1-a))
 	R * c
