@@ -1,18 +1,18 @@
 ## Compute trajectory similarities according to the continuous Fréchet distance, under a convex distance measure.
 
-"frechet" <- function(trajectories, dp=euclidian) {
-	trajectory.similarity(trajectories, implementation=frechet.pairwise, dp=dp, symmetric=TRUE, diagonal=0)
+"frechet" <- function(trajectories, pd=euclidian) {
+	trajectory.similarity(trajectories, implementation=frechet.pairwise, pd=pd, symmetric=TRUE, diagonal=0)
 }
 
-"frechet.decision" <- function(trajectories, epsilon=0, dp=euclidian) {
+"frechet.decision" <- function(trajectories, epsilon=0, pd=euclidian) {
 	trajectory.similarity(trajectories, implementation=frechet.decision,pairwise,
-			epsilon=epsilon, dp=dp, symmetric=TRUE, diagonal=0)
+			epsilon=epsilon, pd=pd, symmetric=TRUE, diagonal=0)
 }
 
-"frechet.pairwise" <- function(T1, T2, dp=euclidian) {
+"frechet.pairwise" <- function(T1, T2, pd=euclidian) {
 	# Exponential search for upper bound on d_F
 	epsilon <- 1.0
-	while (!frechet.decision.pairwise(T1,T2,epsilon,dp)) {
+	while (!frechet.decision.pairwise(T1,T2,epsilon,pd)) {
 		epsilon <- 2 * epsilon
 	}
 
@@ -21,7 +21,7 @@
 	high <- epsilon
 	while (!(((low+high)/2) %in% c(low,high))) {
 		epsilon <- (low+high)/2
-		if (frechet.decision.pairwise(T1,T2,epsilon,dp)) {
+		if (frechet.decision.pairwise(T1,T2,epsilon,pd)) {
 			high <- epsilon
 		} else {
 			low  <- epsilon
@@ -30,20 +30,20 @@
 	epsilon
 }
 
-"frechet.decision.pairwise" <- function(T1, T2, epsilon=0, dp=euclidian) {
+"frechet.decision.pairwise" <- function(T1, T2, epsilon=0, pd=euclidian) {
 	# Set up the free space diagram
 	fsd <- as.list(rep(NA, (nrow(T1)-1)*(nrow(T2)-1)))
 	dim(fsd) <- c(nrow(T1)-1, nrow(T2)-1)	# T1 indexes rows, T2 columns.
 	
 	## First check whether endpoints are free
-	if (dp(T1[1,], T2[1,]) > epsilon
-			|| dp(T1[nrow(T1),], T2[nrow(T2),]) > epsilon) { 
+	if (pd(T1[1,], T2[1,]) > epsilon
+			|| pd(T1[nrow(T1),], T2[nrow(T2),]) > epsilon) { 
 		return(FALSE)
 	}
 	for (i in 1:(nrow(T1)-1)) {
 		for (j in 1:(nrow(T2)-1)) {
-			free.L <- .frechet.free.edge(T2[j,], T1[i,], T1[i+1,], epsilon, dp)
-			free.B <- .frechet.free.edge(T1[i,], T2[j,], T2[j+1,], epsilon, dp)
+			free.L <- .frechet.free.edge(T2[j,], T1[i,], T1[i+1,], epsilon, pd)
+			free.B <- .frechet.free.edge(T1[i,], T2[j,], T2[j+1,], epsilon, pd)
 			## Compute reachable left and bottom boundary
 			reach.L <- if(j==1) {
 				# Left side of the diagram: only reachable if vertical segment
@@ -89,14 +89,14 @@
 ## returns interval boundaries 0 <= a <= b <= 1 such that q1 + alpha (q2-q1) 
 ## has distance at most epsilon to p for a <= alpha <= b, or NULL if no 
 ## interval exists.
-".frechet.free.edge" <- function(p, q1, q2, eps, dp) {
+".frechet.free.edge" <- function(p, q1, q2, eps, pd) {
 	a <- b <- NA
-	if (dp(p,q1) <= eps) { a <- 0 }
-	if (dp(p,q2) <= eps) { b <- 1 }
+	if (pd(p,q1) <= eps) { a <- 0 }
+	if (pd(p,q2) <= eps) { b <- 1 }
 	if (any(is.na(c(a,b)))) {
 		# Find where the distance reaches its minimum to set intervals for the
 		# root finding step
-		dalpha <- function(alpha) { dp(p, q1 + alpha*(q2-q1)) }
+		dalpha <- function(alpha) { pd(p, q1 + alpha*(q2-q1)) }
 		min <- optimize(dalpha, interval=0:1)
 		# Check if the distance ever becomes <= epsilon
 		if (min$objective > eps) { return(NULL) }

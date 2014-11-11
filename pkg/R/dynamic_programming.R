@@ -30,9 +30,9 @@ setMethod(f = "as.numeric",
 # 	T1, T2: trajectories
 # 	i, j:   indices into T1 and T2
 #	prev:   dyn prog table entries that precede this entry horizontally, vertically and/or diagonally
-# 	dp:     a function that provides the distance between two location entries
+# 	pd:     a function that provides the distance between two location entries
 # it returns the table entry for (i,j)
-"traj.sim.dp" <- function(T1, T2, step.fun, dp=euclidian, ...,
+"traj.sim.dp" <- function(T1, T2, step.fun, pd=euclidian, ...,
 		get.matching=FALSE, max.dt=Inf, 
 		steps=list(H=c(0,-1), V=c(-1,0), D=c(-1,-1))) {
 	dp.cols <- rep(list(NULL), nrow(T2))
@@ -65,7 +65,7 @@ setMethod(f = "as.numeric",
 				}
 			})
 			preds <- preds[!is.na(preds)] # Provide only predecessors that are set
-			dp.cols[[j]][[i]] <- step.fun(T1, T2, i, j, preds, dp, ...)
+			dp.cols[[j]][[i]] <- step.fun(T1, T2, i, j, preds, pd, ...)
 		}
 		if (!get.matching) {
 			## Delete column that we no longer need to compute new entries
