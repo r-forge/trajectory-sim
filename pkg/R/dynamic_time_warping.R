@@ -6,19 +6,19 @@
 }
 
 "DTW.pairwise" <- function(T1, T2, pd=euclidian, ...) {
-	traj.sim.dp(T1, T2, .DTW.step.fun, pd, ...)
+	traj.sim.dp(T1, T2, .DTW.step.fun, pd=pd, ...)
 }
 
 ## DP step function for DTW
 ".DTW.step.fun" <-  function(T1, T2, i, j, prev, pd) {
 	if (length(prev) == 0) { 
 		p = new("ts.dp.entry", value=0, pred=NULL, data=list(sum=0, len=0))
-		pd = NULL
+		pred = NULL
 		pv = 0
 	} else {
 		# Select the predecessor with the smallest sum so far
 		pm <- which.min(sapply(prev, function(p) { p@data$sum }))
-		pd <- names(pm)
+		pred <- names(pm)
 		p <- prev[[pm]]
 		pv <- p@value
 	}
@@ -27,7 +27,7 @@
 	l <- p@data$len + 1 # Length of path through matrix
 	new("ts.dp.entry", 
 		value=sqrt(s)/l,
-		pred=pd,
+		pred=pred,
 		data=list(sum=s, len=l))
 }
 

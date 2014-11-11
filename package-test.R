@@ -37,6 +37,7 @@ equal.time (T1, T2)
 #dist <- DTW.pairwise(T1, T2)
 dist <- discrete.frechet.pairwise(T1,T2, get.matching=T)
 dist <- LCSS.pairwise(T1, T2, 1, 2, get.matching=T)
+dist <- DTW.pairwise(T1, T2, get.matching=T)
 dist
 tab <- attr(dist, "table")
 
