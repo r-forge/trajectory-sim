@@ -5,7 +5,7 @@
 }
 
 "frechet.decision" <- function(trajectories, epsilon=0, pd=euclidian) {
-	trajectory.similarity(trajectories, implementation=frechet.decision,pairwise,
+	trajectory.similarity(trajectories, implementation=frechet.decision,pairwise,  ##ATTENTION: shoud be frechet.decision"."pairwise?
 			epsilon=epsilon, pd=pd, symmetric=TRUE, diagonal=0)
 }
 

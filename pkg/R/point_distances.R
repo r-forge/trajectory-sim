@@ -6,6 +6,42 @@
 ## the others as location coordinates.
 ## The input vectors should have identical lengths.
 
+t1 <- matrix(c(0,1,5,0,2,3,1,2,4), 3)
+t2 <- matrix(c(0,3,5,0,1,2,1,3,4), 3)
+
+x1 <- c(0,0,0)
+x2 <- c(2,0,0)
+
+s <- Lp.norm(2)(x1,x2)
+s
+s <- Lp.norm2(2)(x1,x2)
+s
+
+"simple" <- function (p=2) {
+  return (function(x1,x2){x1+x2})
+  
+}
+
+
+"Lp.norm2" <- function (p=2) {
+  if (p <= 0) {
+    stop("The Lp norm is not defined for p <= 0")
+  } else if (p < 1) {
+    warning("The Lp norm is not convex for p < 1")
+  }
+  
+  # The L_infinity norm is a special case
+  if (is.infinite(p)) {
+    return(function(x1, x2) {
+      max(abs(x1[-length(x1)] - x2[-length(x2)]))
+    })
+  }
+  return(function(x1, x2) {
+    sum(abs(x1[-length(x1)] - x2[-length(x2)])^p)^(1/p)
+  })
+}
+
+
 "Lp.norm" <- function (p=2) {
 	if (p <= 0) {
 		stop("The Lp norm is not defined for p <= 0")
@@ -25,6 +61,8 @@
 }
 euclidian <- Lp.norm(2)
 manhattan <- Lp.norm(1)
+
+
 
 ## Distance between lat/long coordinates (and time) on a sphere of radius R.
 ## Yields distance in same units as R. Default R is mean Earth radius in meters.
