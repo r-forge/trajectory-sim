@@ -1,16 +1,11 @@
 ## Implements the equal-time distance between a pair of trajectories
+## Requires that each trajectory has the same temporal extent
 
+"equal.time" <- function(trajectories, pd=euclidian) {
+	trajectory.similarity(trajectories, implementation=equal.time.pairwise, pd=pd, symmetric=TRUE, diagonal=0)
+}
 
-
-
-"equal.time" <- function(t1, t2, pd=euclidian) {
-  
-  #t1 <- matrix(c(0,0,2,2,0,2,2,0,1,2,3,4), 4)
-  #t2 <- matrix(c(0,1,1,3,0,1,0,0,1,2,3,4), 4)  
-  
-  t1 <- matrix(c(0,1,5,0,2,3,1,2,4), 3)
-  t2 <- matrix(c(0,3,5,0,1,2,1,3,4), 3)
-  
+"equal.time.pairwise" <- function(t1, t2, pd=euclidian) {
   LIt1 <- equal.time.LI(t1,t2)
   LIt2 <- equal.time.LI(t2,t1)
   
@@ -19,21 +14,15 @@
   
   maxdis <- max(maxdis1,maxdis2)
   
-  maxdis
-  
   return(maxdis)
 }
 
-
+## Computes the position of t1 at the time of each observation in t2
 "equal.time.LI" <- function(t1, t2) {
-  #t1 <- matrix(c(0,1,5,0,2,3,1,2,4), 3)
-  #t2 <- matrix(c(0,3,5,0,1,2,1,3,4), 3)
-
+  row1 <- nrow(t1)
+  col <- ncol(t1)
   
-  row1=nrow(t1)
-  col=ncol(t1)
-  
-  time1=t1[,col]
+  time1 <- t1[,col]
   
   fl <- vector("list", col -1)   ## fl: function list
 
@@ -42,32 +31,23 @@
   }
   
   time2 <- t2[,col]
-  row2=nrow(t2)
+  row2 <- nrow(t2)
   LIt1 <- matrix(data=NA, nrow=row2, ncol= col)
   for (n in 1:(col-1)){
     LIt1[,n]<- fl[[n]](time2)
   }
   LIt1[,col] <- time2
   
-  LIt1
-  
-  
   return (LIt1)
 }
 
 ##the input t1 and t2 have to be recorded Simultaneously, which also means t1 and t2 have the same numbers of records
-"equal.time.DisSimul" <- function(t1, t2, pd=euclidian) {
-  t1 <- matrix(c(0,1,5,0,2,3,1,2,4), 3)
-  t2 <- matrix(c(0,3,5,0,1,2,1,3,4), 3)
-  
-  t1
-  t2
-  
+"equal.time.DisSimul" <- function(t1, t2, pd=euclidian) {  
   row <- nrow(t1)
   
   maxdis <- 0
   for (n in 1:row) {
-    dis <- pd(t1[n], t2[n])     
+    dis <- pd(t1[n,], t2[n,])
     if(dis > maxdis) {
       maxdis <- max(maxdis,dis)
     }

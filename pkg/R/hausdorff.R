@@ -66,7 +66,7 @@
 				}
 			}
 		}
-		## Assumption: all trajectories are bounded
+		## Assumption: each trajectory is contained in a finite-size bounding box
 		if (is.finite(di)) { d <- max(d, di) }
 	}
 	
