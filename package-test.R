@@ -32,9 +32,7 @@ T2 <- example.traj[[4]]#[9:12,]
 T1 <- matrix(c(0,0,2,2,0,2,2,0,1,2,3,4), 4)
 T2 <- matrix(c(0,1,1,3,0,1,0,0,1,2,3,4), 4)
 
-equal.time (T1, T2)
-
-#dist <- DTW.pairwise(T1, T2)
+dist <- equal.time.pairwise(T1, T2)
 dist <- discrete.frechet.pairwise(T1,T2, get.matching=T)
 dist <- LCSS.pairwise(T1, T2, 1, 2, get.matching=T)
 dist <- DTW.pairwise(T1, T2, get.matching=T)
@@ -58,3 +56,18 @@ DTW(example.traj)
 
 frechet.decision.pairwise(T1, T2, 1)
 frechet.pairwise(T1, T2)
+
+
+## Testing for LIP
+t1 <- matrix(c(0,1,1,2, 0,0,2,2, 0,1,2,3), 4)
+t2 <- matrix(c(0,0,2,2, 0,1,1,2, 0,1,2,3), 4)
+# t1 <- matrix(c(0,2,2,0,   0,1,-1,0, 0,1,2,3), 4)
+# t2 <- matrix(c(1,-1,-1,1, 0,-1,1,0, 0,1,2,3), 4)
+#t1 <- matrix(c(-1,4,0,0, 1,1,-3,2, 0,1,2,3), 4)
+#t2 <- matrix(c(-1,2,1,1, 0,0,-1,2, 0,1,2,3), 4)
+# t1 <- matrix(c(-1,4,2, 1,1,-1, 0,1,2), 3)
+# t2 <- matrix(c(-1,2,1.5, 0,0,-0.5, 0,1,2), 3)
+
+LIP(t1,t2, weight=F)
+
+

@@ -25,18 +25,36 @@ setMethod(f = "trajectory.similarity",
 	res <- matrix(NA, length(trajectories), length(trajectories),
 			dimnames=list(names(trajectories), names(trajectories)))
 	
-	for (i in 1:(length(trajectories))) {
-		## Figure out for which pairs (i,j) we actually need to compute pairwise distances
-		## If the measure is symmetric or has a default for identical trajectories,
-		## some can be skipped.
+	ij.compute <- lapply(1:length(trajectories), function (i) {
 		j.start <- if (!symmetric) { 1 } else { i }
 		j.vals <- j.start:length(trajectories)
 		if (!is.na(diagonal)) { j.vals <- j.vals[j.vals != i] }
+
+		sapply(j.vals, function(j) {
+			c(i,j)
+		})
+	})
+	ij.compute <- matrix(unlist(ij.compute), nrow=2)
+	
+	apply(ij.compute, 2, function(ij, ...) {
+		i <- ij[1]
+		j <- ij[2]
 		
-		for (j in j.vals) {
-			res[i,j] <- implementation(trajectories[[i]], trajectories[[j]], ...)
-		}
-	}
+		res[i,j] <<- implementation(trajectories[[i]], trajectories[[j]], ...)
+	}, ...)
+	
+#	for (i in 1:(length(trajectories))) {
+#		## Figure out for which pairs (i,j) we actually need to compute pairwise distances
+#		## If the measure is symmetric or has a default for identical trajectories,
+#		## some can be skipped.
+#		j.start <- if (!symmetric) { 1 } else { i }
+#		j.vals <- j.start:length(trajectories)
+#		if (!is.na(diagonal)) { j.vals <- j.vals[j.vals != i] }
+#		
+#		for (j in j.vals) {
+#			res[i,j] <- implementation(trajectories[[i]], trajectories[[j]], ...)
+#		}
+#	}
 	
 	if (symmetric) {
 		# Copy the upper triangle of the result into the lower triangle while transposing

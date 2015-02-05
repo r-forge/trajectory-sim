@@ -67,10 +67,14 @@ setMethod(f = "as.numeric",
 			preds <- preds[!is.na(preds)] # Provide only predecessors that are set
 			dp.cols[[j]][[i]] <- step.fun(T1, T2, i, j, preds, pd, ...)
 		}
-		if (!get.matching) {
-			## Delete column that we no longer need to compute new entries
-			dp.cols[[j-1]] <- NULL
-		}
+		# TODO: check step sizes and see which columns can be deleted
+#		if (!get.matching) {
+#			## Delete column that we no longer need to compute new entries,
+#			## in order to save space
+#			if (j >= 2) {
+#				dp.cols[[j-1]] <- NULL
+#			}
+#		}
 	}
 	res <- dp.cols[[nrow(T2)]][[nrow(T1)]]@value
 	## Return matching, DP table values and the table itself, if requested.
