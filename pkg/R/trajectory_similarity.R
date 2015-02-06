@@ -12,7 +12,7 @@ if ("move" %in% rownames(installed.packages()) && require(move)) {
 			function(trajectories, ..., symmetric = FALSE, diagonal=NA) {
 		## Convert the MoveStack into a list of individual trajectories,
 		## represented as matrices with coordinate and time columns
-		trs <- lapply(split(monkey.tr), function(tr) {
+		trs <- lapply(split(trajectories), function(tr) {
 				cbind(tr@coords, datetime=as.double(tr@timestamps)) 
 		})
 		trajectory.similarity(trs, implementation, ..., symmetric=symmetric, diagonal=diagonal)
@@ -25,6 +25,7 @@ setMethod(f = "trajectory.similarity",
 	res <- matrix(NA, length(trajectories), length(trajectories),
 			dimnames=list(names(trajectories), names(trajectories)))
 	
+	## Figure out for which pairs of trajectories to compute similarity scores
 	ij.compute <- lapply(1:length(trajectories), function (i) {
 		j.start <- if (!symmetric) { 1 } else { i }
 		j.vals <- j.start:length(trajectories)
@@ -35,26 +36,19 @@ setMethod(f = "trajectory.similarity",
 		})
 	})
 	ij.compute <- matrix(unlist(ij.compute), nrow=2)
+	ij.compute <- split(ij.compute, col(ij.compute))
 	
-	apply(ij.compute, 2, function(ij, ...) {
+	similarities <- mclapply(ij.compute, function(ij, ...) {
 		i <- ij[1]
 		j <- ij[2]
 		
-		res[i,j] <<- implementation(trajectories[[i]], trajectories[[j]], ...)
-	}, ...)
-	
-#	for (i in 1:(length(trajectories))) {
-#		## Figure out for which pairs (i,j) we actually need to compute pairwise distances
-#		## If the measure is symmetric or has a default for identical trajectories,
-#		## some can be skipped.
-#		j.start <- if (!symmetric) { 1 } else { i }
-#		j.vals <- j.start:length(trajectories)
-#		if (!is.na(diagonal)) { j.vals <- j.vals[j.vals != i] }
-#		
-#		for (j in j.vals) {
-#			res[i,j] <- implementation(trajectories[[i]], trajectories[[j]], ...)
-#		}
-#	}
+		implementation(trajectories[[i]], trajectories[[j]], ...)
+	}, mc.cores=detectCores(logical=T), ...)
+	## Store results in matrix
+	for (k in 1:length(ij.compute)) {
+		ij <- ij.compute[[k]]
+		res[ij[1], ij[2]] <- similarities[[k]]
+	}
 	
 	if (symmetric) {
 		# Copy the upper triangle of the result into the lower triangle while transposing
