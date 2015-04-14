@@ -27,7 +27,6 @@ euclidian <- Lp.norm(2)
 manhattan <- Lp.norm(1)
 
 
-
 ## Distance between lat/long coordinates (and time) on a sphere of radius R.
 ## Yields distance in same units as R. Default R is mean Earth radius in meters.
 ## Great circle distance is accurate to about 0.5% on Earth.

@@ -17,7 +17,7 @@
 				pred=NULL)
 	} else {
 		# Select the predecessor with the smallest d_dF so far
-		pm <- which.min(sapply(prev, function(p) { p@value }))
+		pm <- which.min(sapply(prev, slot, "value" ))
 		p <- prev[[pm]]
 		new("ts.dp.entry",
 				value=max(p@value, pd(T1[i,], T2[j,])),

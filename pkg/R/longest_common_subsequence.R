@@ -16,12 +16,11 @@
 	if (pd(T1[i,], T2[j,]) < epsilon && abs(i-j) <= delta) {
 		if ("D" %in% names(prev)) {
 			p <- "D"
-			pv <- prev[["D"]]@value
+			pv <- prev[["D"]]@value + 1
 		} else {
 			p <- NULL
-			pv <- 0
+			pv <- 1
 		}
-		pv <- pv+1
 	} else {
 		## Select only horiz. and vert. predecessors in a missing-friendly way
 		prev <- prev[names(prev) %in% c("H","V")]

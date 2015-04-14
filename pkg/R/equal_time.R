@@ -12,9 +12,7 @@
   maxdis1 <- equal.time.DisSimul(LIt1,t2,pd)
   maxdis2 <- equal.time.DisSimul(t1,LIt2,pd)
   
-  maxdis <- max(maxdis1,maxdis2)
-  
-  return(maxdis)
+  max(maxdis1,maxdis2)
 }
 
 ## Computes the position of t1 at the time of each observation in t2
@@ -42,7 +40,7 @@
 }
 
 ##the input t1 and t2 have to be recorded Simultaneously, which also means t1 and t2 have the same numbers of records
-"equal.time.DisSimul" <- function(t1, t2, pd=euclidian) {  
+"equal.time.DisSimul" <- function(t1, t2, pd=euclidian) {
   row <- nrow(t1)
   
   maxdis <- 0

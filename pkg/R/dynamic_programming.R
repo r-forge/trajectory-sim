@@ -11,10 +11,7 @@ setClass(Class = "ts.dp.entry",
 	prototype = prototype(
 			value = as.double(NA),
 			pred  = NULL),
-	validity = function(object){
-		if (!is.null(object@pred) && !(object@pred %in% c("H","V","D"))) {
-			stop("'pred' must be NULL or set to 'H', 'V' or 'D', indicating direction of predecessor in table")
-		}
+	validity = function(object) {
 		return(TRUE)
 	}
 )
