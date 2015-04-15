@@ -4,7 +4,6 @@
 \docType{package}
 \title{
 Trajectory Similarity
-~~ package title ~~
 }
 \description{
 Similarity measures for trajectories, including Hausdorff, equal-time, Fréchet distances, dynamic time warping (DTW), longest common subsequence (LCSS), spatiotemporal locality inside polylines (STLIP).
@@ -18,23 +17,20 @@ Version: \tab 1.0\cr
 Date: \tab 2014-07-15\cr
 License: \tab GPL (>= 3)\cr
 }
-~~ An overview of how to use the package, including the most important ~~
-~~ functions ~~
+#~~ An overview of how to use the package, including the most important ~~
+#~~ functions ~~
 }
 \author{
 Dongliang Peng <dongliang.peng@uni-wuerzburg.de>, 
-
+Stef Sijben <Stef.Sijben@ruhr-uni-bochum.de>
 Maintainer: Stef Sijben <Stef.Sijben@ruhr-uni-bochum.de>
-~~ The author and/or maintainer of the package ~~
 }
 \references{
-~~ Literature or other references for background information ~~
 }
 \keyword{ package }
 \seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
+\code{\link[move:move-package]{move}}
 }
 \examples{
-~~ simple examples of the most important functions ~~
+
 }

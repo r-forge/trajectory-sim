@@ -1,2 +1,2 @@
-import(move)
+importFrom(parallel, mclapply)
 exportPattern("^[^\\.]")
