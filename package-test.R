@@ -32,10 +32,11 @@ T2 <- example.traj[[4]]#[9:12,]
 T1 <- matrix(c(0,0,2,2,0,2,2,0,1,2,3,4), 4)
 T2 <- matrix(c(0,1,1,3,0,1,0,0,1,2,3,4), 4)
 
-dist <- equal.time.pairwise(T1, T2)
+dist <- equal.time.pairwise(T1, T2, method="max")
 dist <- discrete.frechet.pairwise(T1,T2, get.matching=T)
 dist <- LCSS.pairwise(T1, T2, 1, 2, get.matching=T)
 dist <- DTW.pairwise(T1, T2, get.matching=T)
+dist <- EDR.pairwise(T1, T2, 2, get.matching=T)
 dist
 tab <- attr(dist, "table")
 

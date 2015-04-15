@@ -1,6 +1,61 @@
 library(sp)
 
-"simple.LIP" <- function(t1, t2) {
+"LIP" <- function (trajectories, weighted=TRUE) {
+	trajectory.similarity(trajectories, implementation=LIP.pairwise, weighted=weighted, symmetric=TRUE, diagonal=0)
+}
+
+"STLIP" <- function (trajectories, st.k, st.delta, weighted=TRUE) {
+	trajectory.similarity(trajectories, implementation=LIP.pairwise, 
+			weighted=weighted, st.k=st.k, st.delta=st.delta,
+			symmetric=TRUE, diagonal=0)
+}
+
+"LIP.pairwise" <- function(t1, t2, weighted=TRUE, st.k=0, st.delta=0) {
+	## Split trajectories at pairwise intersections
+	is <- red_blue.intersections(t1, t2)
+	is <- is[order(is[,3]), , drop=F]
+	## Coinciding endpoints are not proper intersections; drop them
+# 	if (is[1,3] == t1[1,3] && is[1,4] == t2[1,3]) {
+# 		is <- is[-1, ,drop=F]
+# 	}
+# 	if (is[nrow(is),3] == t1[nrow(t1),3] && is[nrow(is),4] == t2[nrow(t2),3]) {
+# 		is <- is[-nrow(is), ,drop=F]
+# 	}
+	
+	t1s <- split.at.intersections(t1, is[,-4, drop=F]) # drop timestamps for the other trajectory
+	t2s <- split.at.intersections(t2, is[,-3, drop=F])
+	
+	# Compute gen.LIP for corresponding pairs of subtrajectories between intersections
+	if (weighted) {
+		weights <- (sapply(t1s, .tr.length) + sapply(t2s, .tr.length)) / 
+				(.tr.length(t1) + .tr.length(t2))
+	} else {
+		weights <- rep(1, length(t1s))
+	}
+	if (st.k > 0) {
+		MDI <- mapply(function(q, s) {
+			## get the time interval for each subtrajectory
+			tq <- q[c(1,nrow(q)),3]
+			ts <- s[c(1,nrow(s)),3]
+			
+			oc <- min(tq[2], ts[2])          - max(tq[1], ts[1])
+			of <- min(tq[2], ts[2]+st.delta) - max(tq[1], ts[1]+st.delta)
+			op <- min(tq[2], ts[2]-st.delta) - max(tq[1], ts[1]-st.delta)
+			max(oc, of, op, 0)
+		}, t1s, t2s)
+		dur <- t1[nrow(t1),3] - t1[1,3] + t2[nrow(t2),3] - t2[1,3]
+		weights <- weights * (1 + 
+			st.k * (1 - 2 * MDI / dur))
+	}
+	sum(weights*mapply(.gen.LIP, t1s, t2s))
+}
+
+"STLIP.pairwise" <- function (t1, t2, st.k, st.delta, weighted=TRUE) {
+	LIP.pairwise(t1, t2, TRUE, st.k=st.k, st.delta=st.delta)
+}
+
+
+".simple.LIP" <- function(t1, t2) {
 	## concatenate t1 with t2 reversed to construct the polygon
 	p <- rbind(t1, t2[nrow(t2):1,])[,1:2] # drop timestamps
 	
@@ -9,7 +64,7 @@ library(sp)
 	              * (p[c(2:nrow(p), 1), 2] - p[, 2]))
 }
 
-"gen.LIP" <- function(t1,t2) {
+".gen.LIP" <- function(t1,t2) {
 	if (nrow(t1) == 1) { tmp <- t1; t1 <- t2; t2 <- tmp }
 	if (nrow(t1) == 1) { return(0) } ## both trajectories are degenerated to points
 	print(t1)
@@ -43,7 +98,7 @@ library(sp)
 		
 		if (d1 == -dir && d2 == -dir) {
 			## Break the polygon here
-			res <- res + simple.LIP(t1[s1:i1,,drop=F], t2[s2:i2,,drop=F])
+			res <- res + .simple.LIP(t1[s1:i1,,drop=F], t2[s2:i2,,drop=F])
 			
 			s1 <- i1
 			s2 <- i2
@@ -55,32 +110,7 @@ library(sp)
 	
 	
 	## Add the last polygon piece and return
-	abs(res + simple.LIP(t1[s1:i1,,drop=F], t2[s2:i2,,drop=F]))
-}
-
-"LIP" <- function(t1, t2, weighted=TRUE) {
-	## Split trajectories at pairwise intersections
-	is <- red_blue.intersections(t1, t2)
-	is <- is[order(is[,3]), , drop=F]
-	## Coinciding endpoints are not proper intersections; drop them
-# 	if (is[1,3] == t1[1,3] && is[1,4] == t2[1,3]) {
-# 		is <- is[-1, ,drop=F]
-# 	}
-# 	if (is[nrow(is),3] == t1[nrow(t1),3] && is[nrow(is),4] == t2[nrow(t2),3]) {
-# 		is <- is[-nrow(is), ,drop=F]
-# 	}
-	
-	t1s <- split.at.intersections(t1, is[,-4, drop=F]) # drop timestamps for the other trajectory
-	t2s <- split.at.intersections(t2, is[,-3, drop=F])
-	
-	# Compute gen.LIP for corresponding pairs of subtrajectories between intersections
-	if (weighted) {
-		weights <- (sapply(t1s, .tr.length) + sapply(t2s, .tr.length)) / 
-				(.tr.length(t1) + .tr.length(t2))
-	} else {
-		weights <- 1
-	}
-	sum(weights*mapply(gen.LIP, t1s, t2s))
+	abs(res + .simple.LIP(t1[s1:i1,,drop=F], t2[s2:i2,,drop=F]))
 }
 
 "red_blue.intersections" <- function(t1, t2) {
