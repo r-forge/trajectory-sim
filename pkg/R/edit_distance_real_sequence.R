@@ -19,7 +19,7 @@
 ".EDR.step.fun" <-  function(T1, T2, i, j, prev, pd, epsilon) {
 	if (length(prev) == 0) {
 		return(new("ts.dp.entry", 
-			value=sum(pd(T1[1,], T2[1,]) < epsilon),
+			value=sum(pd(T1[1,], T2[1,]) >= epsilon),
 			pred=NULL))
 	} else if (length(prev) == 1) {
 		## First row or column entry
@@ -27,7 +27,7 @@
 		pv <- prev[[1]]@value + 1
 		
 		## One may also make a diagonal move here.
-		dc <- max(i,j)-1 + sum(pd(T1[i,], T2[j,]) < epsilon)
+		dc <- max(i,j)-1 + sum(pd(T1[i,], T2[j,]) >= epsilon)
 		if (pv > dc) {
 			p <- NULL
 			pv <- dc
@@ -38,7 +38,7 @@
 		pv[c("H","V")] <- pv[c("H","V")]+1
 		pv["D"] <- pv["D"] + sum(pd(
 				T1[i,], 
-				T2[j,]) < epsilon)
+				T2[j,]) >= epsilon)
 		pv <- pv[which.min(pv)]
 		p <- names(pv)
 		names(pv) <- NULL

@@ -1,8 +1,8 @@
 Package: trajectorySim
 Type: Package
 Title: Trajectory Similarity
-Version: 0.1
-Date: 2015-04-15
+Version: 0.1.1
+Date: 2015-05-12
 Depends: R (>= 3.0.0), parallel (>= 3.0.0)
 Enhances: move (>= 1.2.475)
 Author: Dongliang Peng <dongliang.peng@uni-wuerzburg.de>, Stef Sijben <Stef.Sijben@ruhr-uni-bochum.de>
