@@ -73,7 +73,8 @@ setMethod(f = "as.numeric",
 			## Check step sizes to decide what can be removed
 			keep.rows <- abs(min(0, sapply(steps, "[", 2)))
 			if (j > keep.rows) {
-				#dp.rows[[j-keep.rows]] <- NULL
+				## Don't set to NULL: this shifts other entries in the list
+				dp.rows[[j-keep.rows]] <- NA
 			}
 		}
 	}
