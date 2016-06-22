@@ -15,13 +15,16 @@
 	
 	# The L_infinity norm is a special case
 	if (is.infinite(p)) {
-		return(function(x1, x2) {
+		fn <- function(x1, x2) {
 			max(abs(x1[-length(x1)] - x2[-length(x2)]))
-		})
+		}
+	} else {
+		fn <- function(x1, x2) {
+			sum(abs(x1[-length(x1)] - x2[-length(x2)])^p)^(1/p)
+		}
 	}
-	return(function(x1, x2) {
-		sum(abs(x1[-length(x1)] - x2[-length(x2)])^p)^(1/p)
-	})
+	attr(fn, "Lp.norm") <- p
+	fn
 }
 euclidian <- Lp.norm(2)
 manhattan <- Lp.norm(1)

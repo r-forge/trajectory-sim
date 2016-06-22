@@ -31,6 +31,11 @@
 }
 
 "frechet.decision.pairwise" <- function(T1, T2, epsilon=0, pd=euclidian) {
+	if (attr(pd, "Lp.norm") == 2) {
+		## Use more efficient function to find free intervals for euclidian pd
+	#	".frechet.free.edge" <- .frechet.free.edge.euclid
+	}
+
 	# Set up the free space diagram
 	fsd <- as.list(rep(NA, (nrow(T1)-1)*(nrow(T2)-1)))
 	dim(fsd) <- c(nrow(T1)-1, nrow(T2)-1)	# T1 indexes rows, T2 columns.
@@ -113,3 +118,24 @@
 	c(a,b)
 }
 
+".frechet.free.edge.euclid" <- function(p, q1, q2, eps, pd) {
+	## Drop time information
+	p  <-  p[-length(p)]
+	q1 <- q1[-length(q1)]
+	q2 <- q2[-length(q2)]
+	
+	## Solve the squared distance to p as a function of alpha for eps^2
+	A <- sum((q2-q1)^2)
+	B <- 2 * sum((q2-q1)*(q1-p))
+	C <- sum((q1-p)^2) - eps^2
+	
+	D <- B^2 - 4*A*C
+	if (D < 0) {
+		return(NULL)
+	}
+	intv <- (-B + c(-1,1)*sqrt(D)) / (2 * A)
+	if (intv[1] > 1 || intv[2] < 0) {
+		return(NULL)
+	}
+	pmax(pmin(intv, 1), 0) ## Clamp values to [0,1]
+}
