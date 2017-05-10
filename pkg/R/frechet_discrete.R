@@ -1,4 +1,4 @@
-## Compute trajectory similarities according to the discrete Fréchet distance, under a convex distance measure.
+## Compute trajectory similarities according to the discrete Frechet distance, under a convex distance measure.
 
 "discrete.frechet" <- function(trajectories, pd=euclidian) {
 	trajectory.similarity(trajectories, implementation=discrete.frechet.pairwise, pd=pd, symmetric=TRUE, diagonal=0)
@@ -8,7 +8,7 @@
 	traj.sim.dp(T1, T2, .discrete.frechet.step.fun, pd, ...)
 }
 
-## DP step function for discrete Fréchet
+## DP step function for discrete Frechet
 ".discrete.frechet.step.fun" <- function(T1, T2, i, j, prev, pd) {
 	if (length(prev) == 0) {
 		## Lower left corner of table

@@ -1,4 +1,4 @@
-## Compute trajectory similarities according to the continuous Fréchet distance, under a convex distance measure.
+## Compute trajectory similarities according to the continuous Frechet distance, under a convex distance measure.
 
 "frechet" <- function(trajectories, pd=euclidian) {
 	trajectory.similarity(trajectories, implementation=frechet.pairwise, pd=pd, symmetric=TRUE, diagonal=0)

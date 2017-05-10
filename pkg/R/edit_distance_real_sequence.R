@@ -1,6 +1,6 @@
 ## Compute trajectory similarities according to edit distance on real sequence
 ## Follows definition in:
-## Chen, Lei, M. Tamer Özsu, and Vincent Oria. 
+## Chen, Lei, M. Tamer Ozsu, and Vincent Oria. 
 ## Robust and fast similarity search for moving object trajectories. 
 ## Proc. 2005 ACM SIGMOD intern. conf. Management of data.
 

@@ -75,4 +75,4 @@ frechet(ts)
 STLIP(ts, weight=F, st.k=1, st.delta=2)
 LIP(ts, weight=F)
 
-
+install.packages("trajectory-sim",repos="http://r-forge.r-project.org")
