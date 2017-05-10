@@ -33,7 +33,7 @@
 "frechet.decision.pairwise" <- function(T1, T2, epsilon=0, pd=euclidian) {
 	if (attr(pd, "Lp.norm") == 2) {
 		## Use more efficient function to find free intervals for euclidian pd
-	#	".frechet.free.edge" <- .frechet.free.edge.euclid
+		".frechet.free.edge" <- .frechet.free.edge.euclid
 	}
 
 	# Set up the free space diagram

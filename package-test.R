@@ -34,14 +34,16 @@ T2 <- matrix(c(0,1,1,3,0,1,0,0,1,2,3,4), 4)
 
 dist <- equal.time.pairwise(T1, T2, method="max")
 dist <- discrete.frechet.pairwise(T1,T2, get.matching=T)
-dist <- LCSS.pairwise(T1, T2, 1, 2, get.matching=T)
+dist <- LCSS.pairwise(T1, T2, delta=1, epsilon=2, get.matching=T)
 dist <- DTW.pairwise(T1, T2, get.matching=T)
-dist <- EDR.pairwise(T1, T2, 2, get.matching=T)
+dist <- EDR.pairwise(T1, T2, epsilon=2, get.matching=T)
 dist
+
+## Plot the DP table with the matching computed above
 tab <- attr(dist, "table")
 
 vals <- attr(dist, "table.values")
-image(1:nrow(vals), 1:ncol(vals), vals)
+image(1:ncol(vals), 1:nrow(vals), t(vals)) # Image displays matrices transposed
 points(t(attr(dist, "matching")))
 lines(t(attr(dist, "matching")))
 
@@ -55,7 +57,7 @@ apply(attr(dist, "matching"), 2, function(m) {
 ## Compute pairwise DTW distances between all four trajectories
 DTW(example.traj)
 
-frechet.decision.pairwise(T1, T2, 1)
+frechet.decision.pairwise(T1, T2, epsilon=1)
 frechet.pairwise(T1, T2)
 
 
@@ -70,6 +72,7 @@ ts <- list(matrix(c(0,1,1,2, 0,0,2,2, 0,1,2,3), 4),
 		matrix(c(-1,2,1.5, 0,0,-0.5, 0,1,2), 3))
 
 frechet(ts)
-#LIP(ts, weight=F)
+STLIP(ts, weight=F, st.k=1, st.delta=2)
+LIP(ts, weight=F)
 
 
