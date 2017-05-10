@@ -1,2 +1,4 @@
-importFrom(parallel, mclapply)
+importFrom("parallel", "detectCores", "mclapply")
+importFrom("methods", "new", "slot")
+importFrom("stats", "optimize", "uniroot")
 exportPattern("^[^\\.]")
