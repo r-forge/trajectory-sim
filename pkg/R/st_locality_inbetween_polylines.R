@@ -1,5 +1,3 @@
-library(sp)
-
 "LIP" <- function (trajectories, weighted=TRUE) {
 	trajectory.similarity(trajectories, implementation=LIP.pairwise, weighted=weighted, symmetric=TRUE, diagonal=0)
 }
